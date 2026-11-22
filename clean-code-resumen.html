@@ -1,0 +1,787 @@
+<title>Clean Code por capítulos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Tokens: una columna de lectura, índice arriba, capítulos con ejemplos y lista de chequeo al final */
+:root {
+  --bg: #fafbfc;
+  --fg: #1d2430;
+  --muted: #5d6878;
+  --line: #dde2e9;
+  --accent: #2f6f5e;
+  --chip: #eaf1ee;
+  --code-bg: #f1f4f7;
+  --mal: #a3423a;
+  --bien: #2f6f5e;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161c; --fg: #e3e7ed; --muted: #97a1af; --line: #2a313b;
+    --accent: #7cc4ad; --chip: #1c2a26; --code-bg: #1a2029;
+    --mal: #e48b82; --bien: #7cc4ad; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161c; --fg: #e3e7ed; --muted: #97a1af; --line: #2a313b;
+  --accent: #7cc4ad; --chip: #1c2a26; --code-bg: #1a2029;
+  --mal: #e48b82; --bien: #7cc4ad; color-scheme: dark;
+}
+
+/* CSS general */
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+}
+.pagina {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-block: 3rem 4rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.25; }
+h1 { font-size: 2rem; font-weight: 600; margin: 0 0 .5rem; }
+h2 { font-size: 1.3rem; font-weight: 600; margin: 0; }
+h3 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 .5rem; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Cabecera */
+.datos { color: var(--muted); margin: 0 0 1rem; }
+.nota {
+  font-size: .9rem;
+  color: var(--muted);
+  border-left: 3px solid var(--line);
+  padding-left: .75rem;
+  margin: 0;
+}
+
+/* Índice */
+.indice {
+  margin: 2.5rem 0 3rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding-block: 1rem;
+}
+.indice ol { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 2rem; }
+.indice li { break-inside: avoid; padding: .15rem 0; font-size: .95rem; }
+.indice a { text-decoration: none; color: var(--fg); }
+.indice a:hover { color: var(--accent); }
+.indice .num { font-family: var(--mono); color: var(--muted); font-size: .8rem; display: inline-block; width: 2.2rem; }
+@media (max-width: 520px) { .indice ol { columns: 1; } }
+
+/* Capítulos */
+.capitulos { display: grid; gap: 3.5rem; }
+.capitulo { scroll-margin-top: 1rem; min-width: 0; }
+.etiqueta {
+  font-family: var(--mono);
+  font-size: .75rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 .25rem;
+}
+.original { font-family: var(--mono); font-size: .8rem; color: var(--muted); margin: .15rem 0 .9rem; }
+.idea { margin: 0 0 1rem; }
+.reglas { margin: 0; padding-left: 1.2rem; display: grid; gap: .55rem; }
+.reglas strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: .85em;
+  background: var(--chip);
+  padding: .05em .35em;
+  border-radius: 4px;
+}
+
+/* Ejemplos antes/después */
+.ejemplo { display: grid; gap: .6rem; margin-top: 1.25rem; min-width: 0; }
+.bloque { min-width: 0; }
+.bloque-titulo {
+  font-family: var(--mono);
+  font-size: .72rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin: 0 0 .25rem;
+}
+.bloque.antes .bloque-titulo { color: var(--mal); }
+.bloque.despues .bloque-titulo { color: var(--bien); }
+pre {
+  margin: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: .8rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 1.55;
+}
+.bloque.antes pre { border-left: 3px solid var(--mal); }
+.bloque.despues pre { border-left: 3px solid var(--bien); }
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Lista de chequeo */
+.chequeo { margin-top: 4rem; border-top: 1px solid var(--line); padding-top: 2rem; scroll-margin-top: 1rem; }
+.chequeo-cabecera { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: baseline; justify-content: space-between; }
+.progreso { font-family: var(--mono); font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.grupo { margin-top: 1.25rem; }
+.grupo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+.grupo label { display: flex; gap: .6rem; align-items: flex-start; cursor: pointer; }
+.grupo input { margin-top: .35rem; accent-color: var(--accent); flex: none; }
+.grupo input:checked + span { color: var(--muted); text-decoration: line-through; }
+.boton {
+  font: inherit;
+  font-size: .85rem;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: .3rem .7rem;
+  cursor: pointer;
+}
+.boton:hover { border-color: var(--accent); }
+
+/* Cierre */
+.cierre { margin-top: 3rem; border-top: 1px solid var(--line); padding-top: 1.5rem; }
+.cierre p { margin: 0 0 .75rem; }
+</style>
+
+<main class="pagina">
+  <header>
+    <h1>Clean Code por capítulos</h1>
+    <p class="datos">Robert C. Martin · Prentice Hall, 2008</p>
+    <p class="nota">Este resumen sigue el orden de la 1.ª edición (en español, <em>Código limpio</em>, de Anaya). Los ejemplos son propios y están en JavaScript; el libro usa Java. Al final hay una lista de chequeo para revisar tu código.</p>
+  </header>
+
+  <nav class="indice" aria-label="Índice de capítulos">
+    <ol>
+      <li><a href="#c1"><span class="num">01</span>Código limpio</a></li>
+      <li><a href="#c2"><span class="num">02</span>Nombres con sentido</a></li>
+      <li><a href="#c3"><span class="num">03</span>Funciones</a></li>
+      <li><a href="#c4"><span class="num">04</span>Comentarios</a></li>
+      <li><a href="#c5"><span class="num">05</span>Formato</a></li>
+      <li><a href="#c6"><span class="num">06</span>Objetos y estructuras de datos</a></li>
+      <li><a href="#c7"><span class="num">07</span>Manejo de errores</a></li>
+      <li><a href="#c8"><span class="num">08</span>Límites</a></li>
+      <li><a href="#c9"><span class="num">09</span>Pruebas unitarias</a></li>
+      <li><a href="#c10"><span class="num">10</span>Clases</a></li>
+      <li><a href="#c11"><span class="num">11</span>Sistemas</a></li>
+      <li><a href="#c12"><span class="num">12</span>Emergencia</a></li>
+      <li><a href="#c13"><span class="num">13</span>Concurrencia</a></li>
+      <li><a href="#c14"><span class="num">14</span>Refinamiento sucesivo</a></li>
+      <li><a href="#c15"><span class="num">15</span>Aspectos internos de JUnit</a></li>
+      <li><a href="#c16"><span class="num">16</span>Refactorizar SerialDate</a></li>
+      <li><a href="#c17"><span class="num">17</span>Olores y heurísticas</a></li>
+      <li><a href="#apA"><span class="num">A</span>Concurrencia II</a></li>
+      <li><a href="#chequeo"><span class="num">✓</span>Lista de chequeo</a></li>
+    </ol>
+  </nav>
+
+  <div class="capitulos">
+
+    <!-- Capítulo 1 -->
+    <section class="capitulo" id="c1">
+      <p class="etiqueta">Capítulo 1</p>
+      <h2>Código limpio</h2>
+      <p class="original">Clean Code</p>
+      <p class="idea">El desorden en el código no se nota el primer día, pero se acumula: cada cambio cuesta más que el anterior hasta que el equipo apenas avanza. Mantener el código limpio es parte del trabajo profesional, igual que un médico se lava las manos aunque tenga prisa.</p>
+      <ul class="reglas">
+        <li><strong>El código limpio se lee como prosa bien escrita.</strong> Hace una sola cosa, la hace bien y no esconde sorpresas. Quien lo lee entiende qué pasa sin tener que adivinar.</li>
+        <li><strong>Se lee diez veces más de lo que se escribe.</strong> Por eso conviene gastar tiempo en que sea fácil de leer: ese tiempo se recupera cada vez que alguien vuelve a él.</li>
+        <li><strong>«Ya lo limpiaré luego» casi nunca ocurre.</strong> Las fechas de entrega siempre aprietan, y el desorden de hoy es lo que hará que la próxima entrega llegue tarde.</li>
+        <li><strong>Regla del boy scout.</strong> Deja cada archivo un poco más limpio de como lo encontraste: un nombre mejor o una función partida. Muchas mejoras pequeñas evitan una reescritura grande.</li>
+      </ul>
+    </section>
+
+    <!-- Capítulo 2 -->
+    <section class="capitulo" id="c2">
+      <p class="etiqueta">Capítulo 2</p>
+      <h2>Nombres con sentido</h2>
+      <p class="original">Meaningful Names</p>
+      <p class="idea">Los nombres están en todas partes: variables, funciones, clases y archivos. Un buen nombre responde por qué existe algo, qué hace y cómo se usa. Si necesitas un comentario para explicar un nombre, el nombre no sirve.</p>
+      <ul class="reglas">
+        <li><strong>Revela la intención.</strong> <code>diasDesdeCreacion</code> se entiende sin contexto; <code>d</code> obliga a buscar dónde se asigna.</li>
+        <li><strong>No desinformes.</strong> No llames <code>listaClientes</code> a algo que no es una lista ni uses nombres que solo se diferencian en una letra.</li>
+        <li><strong>Haz distinciones con sentido.</strong> <code>datos1</code> y <code>datos2</code>, o <code>producto</code> y <code>productoInfo</code>, no dicen en qué se diferencian.</li>
+        <li><strong>Nombres pronunciables y fáciles de buscar.</strong> Si no puedes decirlo en voz alta en una reunión, ni encontrarlo con el buscador, cambia el nombre. Las constantes con nombre se encuentran; el número <code>7</code> suelto, no.</li>
+        <li><strong>Sustantivos para clases, verbos para métodos.</strong> <code>Cliente</code> y <code>Factura</code> son cosas; <code>guardar()</code> y <code>calcularTotal()</code> son acciones.</li>
+        <li><strong>Una palabra por concepto.</strong> Si en un sitio es <code>obtener</code>, no uses <code>traer</code> y <code>conseguir</code> en otros para lo mismo.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>const d = 7;
+function getThem(list) {
+  const l1 = [];
+  for (const x of list) if (x[0] === 4) l1.push(x);
+  return l1;
+}</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>const diasDesdeCreacion = 7;
+const ESTADO_MARCADA = 4;
+
+function obtenerCeldasMarcadas(tablero) {
+  return tablero.filter(celda => celda.estado === ESTADO_MARCADA);
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 3 -->
+    <section class="capitulo" id="c3">
+      <p class="etiqueta">Capítulo 3</p>
+      <h2>Funciones</h2>
+      <p class="original">Functions</p>
+      <p class="idea">Las funciones son la primera unidad de organización del código. Una buena función es corta, hace una sola cosa y se lee de arriba abajo como una serie de pasos con nombre.</p>
+      <ul class="reglas">
+        <li><strong>Pequeñas, y luego más pequeñas.</strong> Una función corta cabe en la cabeza de una vez. Si tiene secciones separadas por líneas en blanco, cada sección quiere ser una función.</li>
+        <li><strong>Una sola cosa.</strong> Prueba práctica: si puedes extraer otra función con un nombre que no repita la descripción de la original, hacía más de una cosa.</li>
+        <li><strong>Un nivel de abstracción por función.</strong> No mezcles «procesar el pedido» con «sumar 1 al índice». Los detalles bajan a funciones de nivel inferior.</li>
+        <li><strong>Pocos argumentos.</strong> Cada argumento es algo más que entender y probar. Con más de tres, agrúpalos en un objeto con nombre.</li>
+        <li><strong>Sin argumentos booleanos.</strong> Un <code>true</code> en la llamada no dice nada y revela que la función hace dos cosas. Sepárala en dos.</li>
+        <li><strong>Sin efectos ocultos.</strong> Si <code>comprobarClave()</code> también inicia la sesión, alguien la llamará solo para comprobar y abrirá una sesión sin querer.</li>
+        <li><strong>Separa órdenes de consultas.</strong> Una función cambia algo o responde algo, nunca las dos cosas a la vez.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>function procesarPedido(pedido, enviarCorreo) {
+  if (!pedido.items.length) return -1;
+  let total = 0;
+  for (const item of pedido.items) total += item.precio * item.cantidad;
+  if (pedido.cupon) total *= 0.9;
+  db.guardar({ ...pedido, total });
+  if (enviarCorreo) correo.enviar(pedido.cliente, total);
+  return 0;
+}</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>function procesarPedido(pedido) {
+  validarQueTengaItems(pedido);
+  const total = calcularTotal(pedido);
+  guardarPedido(pedido, total);
+}
+
+function calcularTotal(pedido) {
+  const subtotal = sumarItems(pedido.items);
+  return aplicarCupon(subtotal, pedido.cupon);
+}
+
+// El correo lo envía quien llama, no un argumento booleano</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 4 -->
+    <section class="capitulo" id="c4">
+      <p class="etiqueta">Capítulo 4</p>
+      <h2>Comentarios</h2>
+      <p class="original">Comments</p>
+      <p class="idea">Un comentario suele ser la señal de que el código no logró explicarse solo. Antes de escribirlo, intenta que el código diga lo mismo con nombres y funciones. Los comentarios no se ejecutan ni se prueban, así que se quedan desactualizados y terminan mintiendo.</p>
+      <ul class="reglas">
+        <li><strong>Comentarios que sí valen.</strong> Avisos legales, la intención detrás de una decisión rara, advertencias («esta prueba tarda 10 minutos»), <code>TODO</code> con motivo y documentación de una API pública.</li>
+        <li><strong>Comentarios que sobran.</strong> Los que repiten lo que el código ya dice, los obligatorios por norma en cada función y los que llevan un historial de cambios (para eso está el control de versiones).</li>
+        <li><strong>Nunca dejes código comentado.</strong> Nadie se atreve a borrarlo porque «quizá importa», y se acumula. El control de versiones ya lo guarda.</li>
+        <li><strong>Un comentario engañoso es peor que ninguno.</strong> El lector confía en él y deja de mirar el código.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>// Comprueba si el empleado puede recibir todos los beneficios
+if ((empleado.flags &amp; FLAG_POR_HORA) &amp;&amp; empleado.edad &gt; 65) {
+  // ...
+}</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>if (empleado.puedeRecibirTodosLosBeneficios()) {
+  // ...
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 5 -->
+    <section class="capitulo" id="c5">
+      <p class="etiqueta">Capítulo 5</p>
+      <h2>Formato</h2>
+      <p class="original">Formatting</p>
+      <p class="idea">El formato es comunicación: el orden, los espacios y la sangría le dicen al lector qué va junto y qué es importante. El código que funciona hoy cambiará mañana; el estilo y la legibilidad son lo que dura.</p>
+      <ul class="reglas">
+        <li><strong>Como un artículo de periódico.</strong> El nombre del archivo es el titular, lo de arriba da la visión general y los detalles van hacia abajo.</li>
+        <li><strong>Separación vertical entre conceptos.</strong> Una línea en blanco marca que empieza otra idea. Las líneas que van juntas, sin espacios entre ellas.</li>
+        <li><strong>Cercanía según la relación.</strong> Declara las variables cerca de donde se usan y pon cada función justo debajo de la que la llama: así se lee hacia abajo sin saltar.</li>
+        <li><strong>Líneas de ancho moderado.</strong> Si tienes que desplazarte a la derecha para leer, la línea hace demasiado.</li>
+        <li><strong>Reglas del equipo, no personales.</strong> Un solo estilo para todo el proyecto, mejor si lo aplica un formateador automático.</li>
+      </ul>
+    </section>
+
+    <!-- Capítulo 6 -->
+    <section class="capitulo" id="c6">
+      <p class="etiqueta">Capítulo 6</p>
+      <h2>Objetos y estructuras de datos</h2>
+      <p class="original">Objects and Data Structures</p>
+      <p class="idea">Hay dos formas de organizar datos. Los objetos esconden sus datos y ofrecen comportamiento. Las estructuras de datos muestran sus datos y no tienen comportamiento. Las dos sirven; el problema son los híbridos que hacen un poco de cada cosa.</p>
+      <ul class="reglas">
+        <li><strong>Abstrae, no expongas.</strong> Poner un getter y un setter a cada campo no esconde nada. Ofrece operaciones con sentido: <code>porcentajeDeCombustible()</code> en vez de los litros y la capacidad del tanque por separado.</li>
+        <li><strong>Cada forma tiene su ventaja.</strong> Con objetos es fácil agregar tipos nuevos sin tocar funciones existentes. Con estructuras es fácil agregar funciones nuevas sin tocar los datos. Elige según lo que más vaya a cambiar.</li>
+        <li><strong>Ley de Demeter.</strong> Un método habla solo con sus vecinos directos. Las cadenas largas de llamadas atan tu código a la forma interna de otros objetos.</li>
+        <li><strong>Objetos de transferencia.</strong> Para pasar datos entre capas (por ejemplo, la respuesta de una API) basta una estructura simple sin lógica.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>const ciudad = pedido.getCliente().getDireccion().getCiudad();
+calcularEnvio(ciudad);</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>// El pedido sabe a dónde se envía; quien llama no recorre su interior
+const costo = pedido.calcularCostoDeEnvio();</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 7 -->
+    <section class="capitulo" id="c7">
+      <p class="etiqueta">Capítulo 7</p>
+      <h2>Manejo de errores</h2>
+      <p class="original">Error Handling</p>
+      <p class="idea">Las cosas fallan, y el código tiene que manejarlo. Pero si el manejo de errores se mezcla con todo, ya no se ve qué hace el programa. El objetivo es un código robusto que siga siendo legible.</p>
+      <ul class="reglas">
+        <li><strong>Excepciones en vez de códigos de error.</strong> Un <code>-1</code> obliga a quien llama a comprobarlo enseguida, y si se le olvida el error pasa desapercibido. Una excepción separa el camino normal del de error.</li>
+        <li><strong>Empieza por el <code>try-catch-finally</code>.</strong> Define primero qué pasa si algo falla; el resto del código queda dentro de ese marco.</li>
+        <li><strong>Da contexto.</strong> El mensaje debe decir qué operación falló y con qué dato, para depurar sin adivinar.</li>
+        <li><strong>No devuelvas <code>null</code>.</strong> Cada <code>null</code> obliga a comprobarlo en todos los sitios, y basta olvidarlo una vez para que falle. Devuelve una lista vacía, un objeto de caso especial o lanza una excepción.</li>
+        <li><strong>No pases <code>null</code>.</strong> Si una función no acepta <code>null</code> como dato válido, no se lo pases.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>function buscarUsuario(id) {
+  const fila = db.consultar(id);
+  if (!fila) return null;
+  return fila;
+}
+
+const usuario = buscarUsuario(5);
+if (usuario !== null) {
+  if (usuario.pedidos !== null) mostrar(usuario.pedidos);
+}</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>function buscarUsuario(id) {
+  const fila = db.consultar(id);
+  if (!fila) throw new UsuarioNoEncontrado(`No existe el usuario ${id}`);
+  return fila;
+}
+
+function pedidosDe(usuario) {
+  return usuario.pedidos ?? []; // lista vacía, nunca null
+}
+
+mostrar(pedidosDe(buscarUsuario(5)));</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 8 -->
+    <section class="capitulo" id="c8">
+      <p class="etiqueta">Capítulo 8</p>
+      <h2>Límites</h2>
+      <p class="original">Boundaries</p>
+      <p class="idea">Casi todo proyecto usa librerías y servicios de otros. Su autor quiere servir a muchos casos; tú necesitas solo el tuyo. Si su API se usa en todo el proyecto, cada cambio de versión te obliga a tocar decenas de archivos.</p>
+      <ul class="reglas">
+        <li><strong>Envuelve lo externo.</strong> Crea una interfaz propia y pequeña que exponga solo lo que usas. Si cambias de librería, cambias un archivo.</li>
+        <li><strong>Pruebas de aprendizaje.</strong> Al conocer una API nueva, escribe pruebas que comprueben lo que esperas de ella. Te enseñan a usarla y, al actualizar la versión, te avisan si algo cambió.</li>
+        <li><strong>Código que aún no existe.</strong> Si otro equipo no ha terminado su parte, define la interfaz que te gustaría tener, programa contra ella y adáptala cuando llegue la real.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>// En veinte archivos distintos:
+import axios from 'axios';
+const respuesta = await axios.get(`/api/clientes/${id}`);
+const cliente = respuesta.data;</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>// clientesApi.js: único archivo que conoce la librería
+import axios from 'axios';
+
+export async function obtenerCliente(id) {
+  const respuesta = await axios.get(`/api/clientes/${id}`);
+  return respuesta.data;
+}
+
+// En el resto del proyecto:
+const cliente = await obtenerCliente(id);</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 9 -->
+    <section class="capitulo" id="c9">
+      <p class="etiqueta">Capítulo 9</p>
+      <h2>Pruebas unitarias</h2>
+      <p class="original">Unit Tests</p>
+      <p class="idea">Las pruebas permiten cambiar el código sin miedo. Si son desordenadas, cuesta tanto mantenerlas que se abandonan, y sin pruebas el código de producción vuelve a pudrirse. Merecen el mismo cuidado que el resto.</p>
+      <ul class="reglas">
+        <li><strong>Las tres leyes de TDD.</strong> No escribas código de producción sin una prueba que falle; escribe solo la prueba justa para que falle; escribe solo el código justo para que pase. Así las pruebas cubren todo lo que haces.</li>
+        <li><strong>La legibilidad manda.</strong> Una prueba es documentación ejecutable. Sigue la forma preparar, actuar y comprobar, y oculta los detalles repetitivos en funciones auxiliares.</li>
+        <li><strong>Un concepto por prueba.</strong> Si falla, el nombre ya dice qué se rompió.</li>
+        <li><strong>F.I.R.S.T.</strong> Rápidas (si tardan, no se ejecutan), independientes (ninguna depende de otra), repetibles (en cualquier máquina), con resultado claro (pasa o falla, sin revisar a mano) y escritas a tiempo (justo antes del código).</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>test('prueba1', () => {
+  const c = new Carrito(); c.agregar({ p: 10, q: 2 }); c.agregar({ p: 5, q: 1 });
+  expect(c.total()).toBe(25); c.vaciar(); expect(c.total()).toBe(0);
+});</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>test('el total suma precio por cantidad de cada producto', () => {
+  // Preparar
+  const carrito = new Carrito();
+  carrito.agregar({ precio: 10, cantidad: 2 });
+  carrito.agregar({ precio: 5, cantidad: 1 });
+  // Actuar
+  const total = carrito.total();
+  // Comprobar
+  expect(total).toBe(25);
+});
+
+test('un carrito vaciado tiene total cero', () => {
+  const carrito = carritoConProductos();
+  carrito.vaciar();
+  expect(carrito.total()).toBe(0);
+});</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 10 -->
+    <section class="capitulo" id="c10">
+      <p class="etiqueta">Capítulo 10</p>
+      <h2>Clases</h2>
+      <p class="original">Classes</p>
+      <p class="idea">Las clases también deben ser pequeñas, pero se miden en responsabilidades, no en líneas. Un sistema con muchas clases pequeñas y bien nombradas es como un cajón con compartimentos etiquetados: encuentras lo que buscas sin revolver.</p>
+      <ul class="reglas">
+        <li><strong>Responsabilidad única.</strong> Una clase debe tener un solo motivo para cambiar. Si para describirla dices «y», probablemente son dos clases.</li>
+        <li><strong>Alta cohesión.</strong> Los métodos de una clase usan la mayoría de sus variables. Si un grupo de métodos usa solo una parte de las variables, ahí hay otra clase.</li>
+        <li><strong>Organiza para el cambio.</strong> Agregar una función nueva debería significar agregar una clase, no editar una existente y arriesgarse a romperla (abierto a extensión, cerrado a modificación).</li>
+        <li><strong>Depende de abstracciones.</strong> Si una clase usa una interfaz en lugar de una implementación concreta, puedes cambiar o simular esa pieza en las pruebas.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>class Factura {
+  calcularTotal() { /* ... */ }
+  generarPdf() { /* ... */ }
+  enviarPorCorreo() { /* ... */ }
+  guardarEnBaseDeDatos() { /* ... */ }
+}
+// Cuatro motivos para cambiar: impuestos, diseño, correo y base de datos</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>class Factura            { calcularTotal() { /* ... */ } }
+class GeneradorPdfFactura { generar(factura) { /* ... */ } }
+class NotificadorFacturas { enviar(factura, destino) { /* ... */ } }
+class RepositorioFacturas { guardar(factura) { /* ... */ } }</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 11 -->
+    <section class="capitulo" id="c11">
+      <p class="etiqueta">Capítulo 11</p>
+      <h2>Sistemas</h2>
+      <p class="original">Systems</p>
+      <p class="idea">Una ciudad funciona porque nadie la controla entera: hay equipos para el agua, la luz y el tráfico, cada uno con su nivel de detalle. Un sistema de software necesita la misma separación para crecer.</p>
+      <ul class="reglas">
+        <li><strong>Separa construir de usar.</strong> Crear los objetos y conectarlos es una tarea distinta de usarlos. Hazla en un solo lugar (el arranque, <code>main</code> o una fábrica) y no la repartas por el código.</li>
+        <li><strong>Inyección de dependencias.</strong> Una clase recibe lo que necesita en vez de crearlo. Así no queda atada a una base de datos o servicio concreto, y en las pruebas le pasas una versión falsa.</li>
+        <li><strong>Separa lo transversal.</strong> Persistencia, seguridad, transacciones y registros afectan a todo, pero no deben mezclarse con la lógica de negocio.</li>
+        <li><strong>Crece poco a poco.</strong> No hace falta diseñar todo el sistema por adelantado. Con las piezas bien separadas, la arquitectura puede crecer cuando la necesidad sea real.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>class ServicioPedidos {
+  constructor() {
+    this.repositorio = new RepositorioMySql('prod-db:3306');
+  }
+}
+// Imposible probarlo sin la base de datos real</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>class ServicioPedidos {
+  constructor(repositorio) {
+    this.repositorio = repositorio;
+  }
+}
+
+// main.js: el único lugar que construye el sistema
+const servicio = new ServicioPedidos(new RepositorioMySql(config.db));
+
+// En las pruebas
+const servicioDePrueba = new ServicioPedidos(new RepositorioEnMemoria());</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 12 -->
+    <section class="capitulo" id="c12">
+      <p class="etiqueta">Capítulo 12</p>
+      <h2>Emergencia</h2>
+      <p class="original">Emergence</p>
+      <p class="idea">Un buen diseño no tiene que planearse entero de antemano: aparece si sigues cuatro reglas simples, propuestas por Kent Beck, en este orden de importancia.</p>
+      <ul class="reglas">
+        <li><strong>Pasa todas las pruebas.</strong> Un sistema que no se puede comprobar no se puede cambiar con confianza. Además, hacer el código fácil de probar empuja hacia clases pequeñas y poco acopladas.</li>
+        <li><strong>No tiene duplicación.</strong> Cada duplicado es trabajo extra y un riesgo: si cambias una copia y olvidas la otra, aparece un error. Eliminarla suele revelar abstracciones útiles.</li>
+        <li><strong>Expresa la intención.</strong> Nombres claros, funciones y clases pequeñas, y pruebas que sirvan de ejemplo. La mayor parte del costo de un proyecto está en mantenerlo.</li>
+        <li><strong>Minimiza clases y métodos.</strong> No crees una interfaz para cada clase ni separes por dogma. Esta regla es la menos importante: las tres anteriores van primero.</li>
+      </ul>
+    </section>
+
+    <!-- Capítulo 13 -->
+    <section class="capitulo" id="c13">
+      <p class="etiqueta">Capítulo 13</p>
+      <h2>Concurrencia</h2>
+      <p class="original">Concurrency</p>
+      <p class="idea">La concurrencia separa qué se hace de cuándo se hace, y eso puede mejorar el rendimiento. Pero introduce errores que aparecen solo a veces, son difíciles de reproducir y no se ven al leer el código.</p>
+      <ul class="reglas">
+        <li><strong>Mitos.</strong> La concurrencia no siempre mejora el rendimiento, sí cambia el diseño y no basta con entender el lenguaje: hay que entender los problemas clásicos.</li>
+        <li><strong>Aísla el código concurrente.</strong> Tiene su propio ciclo de cambios y sus propias dificultades. Mantenlo separado del resto.</li>
+        <li><strong>Limita los datos compartidos.</strong> Cuantos menos datos compartan los hilos, menos sitios donde pueden pisarse. Prefiere copias y datos independientes.</li>
+        <li><strong>Conoce los modelos clásicos.</strong> Productor-consumidor, lectores-escritores y la cena de los filósofos explican la mayoría de los problemas reales.</li>
+        <li><strong>Secciones sincronizadas pequeñas.</strong> Los bloqueos cuestan rendimiento; protege solo lo imprescindible.</li>
+        <li><strong>Prueba en serio.</strong> Ejecuta las pruebas muchas veces y en distintas configuraciones. Un fallo esporádico no es mala suerte: es un error real.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>// Dos peticiones a la vez leen el mismo saldo y una pisa a la otra
+const saldo = await db.leerSaldo(cuenta);
+await db.guardarSaldo(cuenta, saldo - monto);</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>// La base de datos resta en una sola operación atómica
+await db.ejecutar(
+  'UPDATE cuentas SET saldo = saldo - ? WHERE id = ?',
+  [monto, cuenta]
+);</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capítulo 14 -->
+    <section class="capitulo" id="c14">
+      <p class="etiqueta">Capítulo 14</p>
+      <h2>Refinamiento sucesivo</h2>
+      <p class="original">Successive Refinement</p>
+      <p class="idea">Caso práctico: un analizador de argumentos de línea de comandos. El autor muestra primero una versión que funciona pero está enredada, y después la limpia paso a paso.</p>
+      <ul class="reglas">
+        <li><strong>El primer borrador nunca sale limpio.</strong> Escribir código es como escribir un texto: primero lo haces funcionar y luego lo pules. No hacerlo es abandonar el trabajo a medias.</li>
+        <li><strong>Para antes de que se pudra.</strong> El autor vio que cada tipo de argumento nuevo complicaba el código, y paró a reorganizar antes de agregar más.</li>
+        <li><strong>Cambios pequeños y pruebas siempre.</strong> Cada paso deja el programa funcionando. Así un error nunca está lejos del último cambio.</li>
+        <li><strong>El desorden crece en silencio.</strong> Limpiar algo de hace cinco minutos es fácil; limpiar algo de hace meses, con todo construido encima, es carísimo.</li>
+      </ul>
+    </section>
+
+    <!-- Capítulo 15 -->
+    <section class="capitulo" id="c15">
+      <p class="etiqueta">Capítulo 15</p>
+      <h2>Aspectos internos de JUnit</h2>
+      <p class="original">JUnit Internals</p>
+      <p class="idea">Caso práctico: el autor revisa un módulo de JUnit que ya estaba bien escrito y aun así encuentra mejoras.</p>
+      <ul class="reglas">
+        <li><strong>Hasta el buen código puede mejorar.</strong> Quita prefijos innecesarios de los nombres, encapsula condiciones en funciones con nombre y parte las funciones largas.</li>
+        <li><strong>Pequeñas mejoras se suman.</strong> Ningún cambio es grande, pero juntos hacen el módulo más fácil de leer.</li>
+        <li><strong>Es la regla del boy scout aplicada a código ajeno.</strong> Mejorar lo que no escribiste también es tu responsabilidad.</li>
+      </ul>
+    </section>
+
+    <!-- Capítulo 16 -->
+    <section class="capitulo" id="c16">
+      <p class="etiqueta">Capítulo 16</p>
+      <h2>Refactorizar SerialDate</h2>
+      <p class="original">Refactoring SerialDate</p>
+      <p class="idea">Caso práctico: revisar y refactorizar una clase de fechas de una librería de código abierto real, con respeto por el trabajo de su autor.</p>
+      <ul class="reglas">
+        <li><strong>Primero, las pruebas.</strong> Antes de tocar nada, el autor amplía la cobertura de pruebas, y al hacerlo descubre errores que ya existían.</li>
+        <li><strong>Después, limpiar.</strong> Quita dependencias innecesarias, código muerto y nombres confusos, y mueve cada método a la clase donde tiene sentido.</li>
+        <li><strong>Criticar con respeto es parte del oficio.</strong> Señalar problemas en el código de otro, con argumentos, es como se mejora en equipo.</li>
+      </ul>
+    </section>
+
+    <!-- Capítulo 17 -->
+    <section class="capitulo" id="c17">
+      <p class="etiqueta">Capítulo 17</p>
+      <h2>Olores y heurísticas</h2>
+      <p class="original">Smells and Heuristics</p>
+      <p class="idea">Catálogo de señales de que el código necesita limpieza, reunido a lo largo del libro. Cada señal tiene un código (C1, F1, G1…) para nombrarla en las revisiones.</p>
+      <ul class="reglas">
+        <li><strong>Comentarios.</strong> Obsoletos, redundantes, mal escritos o con código comentado.</li>
+        <li><strong>Entorno.</strong> Compilar o ejecutar las pruebas requiere más de un paso.</li>
+        <li><strong>Funciones.</strong> Demasiados argumentos, argumentos de salida, argumentos booleanos y funciones que nadie llama.</li>
+        <li><strong>Generales.</strong> Duplicación, niveles de abstracción mezclados, números mágicos, condiciones sin encapsular, comportamiento obvio que falta y código en la clase equivocada.</li>
+        <li><strong>Nombres.</strong> Poco descriptivos, que no reflejan su nivel de abstracción o que esconden efectos secundarios.</li>
+        <li><strong>Pruebas.</strong> Insuficientes, lentas, que ignoran los casos límite o que se desactivan sin explicación.</li>
+      </ul>
+      <div class="ejemplo">
+        <div class="bloque antes">
+          <p class="bloque-titulo">Antes</p>
+<pre><code>if (usuario.intentos &gt; 3 &amp;&amp; Date.now() - usuario.ultimoIntento &lt; 900000) {
+  bloquear(usuario);
+}</code></pre>
+        </div>
+        <div class="bloque despues">
+          <p class="bloque-titulo">Después</p>
+<pre><code>const MAX_INTENTOS = 3;
+const VENTANA_BLOQUEO_MS = 15 * 60 * 1000;
+
+function superoIntentosRecientes(usuario) {
+  const esReciente = Date.now() - usuario.ultimoIntento &lt; VENTANA_BLOQUEO_MS;
+  return usuario.intentos &gt; MAX_INTENTOS &amp;&amp; esReciente;
+}
+
+if (superoIntentosRecientes(usuario)) bloquear(usuario);</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Apéndice A -->
+    <section class="capitulo" id="apA">
+      <p class="etiqueta">Apéndice A</p>
+      <h2>Concurrencia II</h2>
+      <p class="original">Concurrency II</p>
+      <p class="idea">Amplía el capítulo 13 con un ejemplo de cliente-servidor y un análisis de los bloqueos.</p>
+      <ul class="reglas">
+        <li><strong>Lo que parece atómico no lo es.</strong> Una operación de una sola línea, como incrementar un contador, son varios pasos para la máquina, y otro hilo puede colarse entre ellos.</li>
+        <li><strong>Las cuatro condiciones del interbloqueo.</strong> Exclusión mutua, retener mientras se espera, sin expropiación y espera circular. Si rompes cualquiera de ellas, el interbloqueo no puede ocurrir.</li>
+        <li><strong>Mide antes de concurrir.</strong> En el ejemplo de cliente-servidor, primero se averigua dónde se pierde el tiempo y luego se decide qué paralelizar.</li>
+        <li><strong>Prueba el código multihilo.</strong> Fuerza intercalados distintos con pausas o herramientas específicas, para que los fallos raros aparezcan antes de producción.</li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- Lista de chequeo -->
+  <section class="chequeo" id="chequeo" aria-labelledby="titulo-chequeo">
+    <div class="chequeo-cabecera">
+      <h2 id="titulo-chequeo">Lista de chequeo</h2>
+      <span class="progreso" id="progreso" aria-live="polite">0 de 0</span>
+    </div>
+    <p class="nota" style="margin-top:.75rem">Para revisar un archivo o una función antes de darla por terminada. Las marcas se guardan solo en este navegador.</p>
+
+    <div class="grupo">
+      <h3>Nombres</h3>
+      <ul>
+        <li><label><input type="checkbox" id="ch-nombres-1"><span>Cada nombre dice qué es o qué hace sin necesitar un comentario.</span></label></li>
+        <li><label><input type="checkbox" id="ch-nombres-2"><span>No hay números ni textos mágicos: son constantes con nombre.</span></label></li>
+        <li><label><input type="checkbox" id="ch-nombres-3"><span>Uso la misma palabra para el mismo concepto en todo el proyecto.</span></label></li>
+      </ul>
+    </div>
+
+    <div class="grupo">
+      <h3>Funciones</h3>
+      <ul>
+        <li><label><input type="checkbox" id="ch-funciones-1"><span>Cada función hace una sola cosa y cabe en la pantalla sin desplazarse.</span></label></li>
+        <li><label><input type="checkbox" id="ch-funciones-2"><span>Tiene tres argumentos o menos, y ninguno es un booleano que cambia su comportamiento.</span></label></li>
+        <li><label><input type="checkbox" id="ch-funciones-3"><span>No tiene efectos secundarios ocultos; cambia algo o responde algo, no las dos cosas.</span></label></li>
+        <li><label><input type="checkbox" id="ch-funciones-4"><span>No hay código duplicado.</span></label></li>
+      </ul>
+    </div>
+
+    <div class="grupo">
+      <h3>Comentarios y formato</h3>
+      <ul>
+        <li><label><input type="checkbox" id="ch-formato-1"><span>Los comentarios explican el porqué, no repiten el qué.</span></label></li>
+        <li><label><input type="checkbox" id="ch-formato-2"><span>No queda código comentado ni comentarios desactualizados.</span></label></li>
+        <li><label><input type="checkbox" id="ch-formato-3"><span>El archivo se lee de arriba abajo: lo general primero y los detalles después.</span></label></li>
+      </ul>
+    </div>
+
+    <div class="grupo">
+      <h3>Errores</h3>
+      <ul>
+        <li><label><input type="checkbox" id="ch-errores-1"><span>Uso excepciones con mensajes que dicen qué falló y con qué dato.</span></label></li>
+        <li><label><input type="checkbox" id="ch-errores-2"><span>No devuelvo ni paso <code>null</code>.</span></label></li>
+      </ul>
+    </div>
+
+    <div class="grupo">
+      <h3>Clases y dependencias</h3>
+      <ul>
+        <li><label><input type="checkbox" id="ch-clases-1"><span>Cada clase tiene un solo motivo para cambiar.</span></label></li>
+        <li><label><input type="checkbox" id="ch-clases-2"><span>Las dependencias se reciben desde fuera, no se crean dentro.</span></label></li>
+        <li><label><input type="checkbox" id="ch-clases-3"><span>Las librerías externas están envueltas en un módulo propio.</span></label></li>
+        <li><label><input type="checkbox" id="ch-clases-4"><span>No hay cadenas largas de llamadas como <code>a.b().c().d()</code>.</span></label></li>
+      </ul>
+    </div>
+
+    <div class="grupo">
+      <h3>Pruebas</h3>
+      <ul>
+        <li><label><input type="checkbox" id="ch-pruebas-1"><span>Lo nuevo tiene pruebas, y todas pasan.</span></label></li>
+        <li><label><input type="checkbox" id="ch-pruebas-2"><span>Cada prueba comprueba un solo concepto y su nombre dice cuál.</span></label></li>
+        <li><label><input type="checkbox" id="ch-pruebas-3"><span>Las pruebas son rápidas e independientes entre sí.</span></label></li>
+      </ul>
+    </div>
+
+    <p style="margin-top:1.25rem"><button type="button" class="boton" id="desmarcar">Desmarcar todo</button></p>
+  </section>
+
+  <footer class="cierre">
+    <p><strong>En una línea:</strong> escribe código pensando en quien lo leerá después, que muchas veces serás tú.</p>
+    <p class="nota">Resumen y ejemplos propios, escritos sin citar el libro. Para el detalle completo, consulta el original.</p>
+  </footer>
+</main>
+
+<script>
+// Lista de chequeo: progreso y marcas guardadas en este navegador
+(function () {
+  const CLAVE = 'clean-code-chequeo';
+  const casillas = Array.from(document.querySelectorAll('.chequeo input[type="checkbox"]'));
+  const progreso = document.getElementById('progreso');
+
+  function leerMarcas() {
+    try { return JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { return {}; }
+  }
+  function guardarMarcas() {
+    const marcas = {};
+    casillas.forEach(c => { if (c.checked) marcas[c.id] = true; });
+    try { localStorage.setItem(CLAVE, JSON.stringify(marcas)); } catch (e) {}
+  }
+  function actualizarProgreso() {
+    const hechas = casillas.filter(c => c.checked).length;
+    progreso.textContent = hechas + ' de ' + casillas.length;
+  }
+
+  const marcas = leerMarcas();
+  casillas.forEach(c => {
+    if (marcas[c.id]) c.checked = true;
+    c.addEventListener('change', () => { guardarMarcas(); actualizarProgreso(); });
+  });
+  document.getElementById('desmarcar').addEventListener('click', () => {
+    casillas.forEach(c => { c.checked = false; });
+    guardarMarcas();
+    actualizarProgreso();
+  });
+  actualizarProgreso();
+})();
+</script>
