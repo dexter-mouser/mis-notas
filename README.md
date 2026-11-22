@@ -4,13 +4,14 @@ Notas y resúmenes propios de libros de programación.
 
 ## Contenido
 
-| Archivo | Qué es |
+| Nota | Qué es |
 | --- | --- |
-| `clean-code-resumen.html` | Resumen por capítulos de *Clean Code* (Robert C. Martin), con ejemplos de código antes y después, y una lista de chequeo. |
+| [Clean Code por capítulos](https://dexter-mouser.github.io/mis-notas/clean-code-resumen.html) | Resumen por capítulos de *Clean Code* (Robert C. Martin), con ejemplos de código antes y después, y una lista de chequeo. |
 
 ## Cómo verlo
 
-No necesita instalación. Abre `clean-code-resumen.html` en cualquier navegador.
+- **En línea:** las notas se publican con GitHub Pages desde la rama `main`, en `https://dexter-mouser.github.io/mis-notas/`.
+- **En local:** no necesita instalación. Abre el archivo `.html` en cualquier navegador.
 
 ## Cómo funciona
 
